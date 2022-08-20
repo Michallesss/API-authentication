@@ -1,0 +1,21 @@
+{
+  "name": "website-api",
+  "version": "1.0.0",
+  "description": "full website with login system(need jwt token), password hash, api authentication, templates and api",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "nodemon app.js"
+  },
+  "author": "Mikael#0168",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "express": "^4.18.1",
+    "hbs": "^4.2.0",
+    "joi": "^17.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^4.9.0",
+    "nodemon": "^2.0.19"
+  }
+}
