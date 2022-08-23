@@ -1,6 +1,8 @@
 const mongodb=require('mongodb').MongoClient;
 const router=require('express').Router();
 const bcrypt=require('bcrypt');
+const jwt=require('jsonwebtoken');
+const verify=require('./verifytoken');
 module.exports=router;
 
 // Connect to DB
@@ -28,8 +30,18 @@ mongodb.connect(url, {}, (err, client)=>{
         });
         if(error) {return res.status(400).send(error.details[0].message);}
     
-        // Is exist
-        /* code */
+        // If exist
+        const user=await db.collection(collection).findOne({name: value.name});
+        if(!user) {return res.status(400).send('Name or password is wrong 1');}
+
+        // Hash password
+        //const validPass=await bcrypt.compare(req.password, user.password); //TODO: working password hashing
+        // ! nie działa hashowanie wymaga chyba daty w bazie wtf (Error: data and hash arguments required)
+        //if(!validPass) {return res.status(400).send('Name or password is wrong 2');}
+
+        // Auth token
+        const token=jwt.sign({_id: user._id}, process.env.TOKEN_SECRET);
+        res.status(200).header('auth-token', token).send(token);
     });
 
     router.post('/register', async (req, res)=>{
@@ -52,7 +64,7 @@ mongodb.connect(url, {}, (err, client)=>{
             value.password=hashedpassword;
 
             // Save to database
-            db.collection(collection).insertOne(value, (error)=>{
+            await db.collection(collection).insertOne(value, (error)=>{
                 if(error) {return res.status(400).send('Something is wrong while inserting date');}
             });
             res.send(value);
@@ -62,7 +74,10 @@ mongodb.connect(url, {}, (err, client)=>{
 
     
     // APIs
-    router.get('/users', (req, res)=>{
-        res.send('there will be users');
+    router.get('/users', verify, (req, res)=>{
+        res.json({
+            "title":"Papiez nie zyje",
+            "Content":"Ez lol"
+        });
     });
 });

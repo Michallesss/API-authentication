@@ -1,8 +1,7 @@
+const dotenv=require('dotenv');
+dotenv.config();
 const express=require('express');
 const app=express();
-//const Joi=require('joi');
-//const bcrypt=require('bcrypt');
-//const jwt=require('jsonwebtoken');
 const port=process.env.PORT || 3000;
 app.set('view engine','hbs');
 app.use('/public', express.static('public'));
