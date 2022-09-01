@@ -6,7 +6,7 @@ const verify=require('./verifytoken');
 module.exports=router;
 
 // Connect to DB
-const url='mongodb://127.0.0.1:27017';
+const url='mongodb://127.0.0.1:27017'; // ! DB url
 mongodb.connect(url, {}, (err, client)=>{
     if(err) {
         return console.error('\x1b[31m','Database error:','\x1b[0m',err);
@@ -14,13 +14,13 @@ mongodb.connect(url, {}, (err, client)=>{
     else {
         console.log('\x1b[32m','Server connected','\x1b[0m',`(on url ${url})...`);
     }
-    const dbname='NodeAPI';
-    const collection='users';
+    const dbname='NodeAPI'; // ! DB name
+    const collection='users'; // ! DB collection
     const db=client.db(dbname);
     
 
 
-    // Auth
+    // Login
     router.post('/login', async (req, res)=>{
         // Validate
         const schema=require('./model/user').login;
@@ -35,15 +35,18 @@ mongodb.connect(url, {}, (err, client)=>{
         if(!user) {return res.status(400).send('Name or password is wrong 1');}
 
         // Hash password
+        // ! dodać salt może dlatego nie działa logowanie
         //const validPass=await bcrypt.compare(req.password, user.password); //TODO: working password hashing
-        // ! nie działa hashowanie wymaga chyba daty w bazie wtf (Error: data and hash arguments required)
+        // ! nie działa hashowanie wymaga chyba daty w bazie wtf (Error: data and hash arguments required) 
         //if(!validPass) {return res.status(400).send('Name or password is wrong 2');}
+        // ! ustaw niżej salt na '' i przetestuj :)
 
         // Auth token
         const token=jwt.sign({_id: user._id}, process.env.TOKEN_SECRET);
         res.status(200).header('auth-token', token).send(token);
     });
 
+    // Register
     router.post('/register', async (req, res)=>{
         // Validate
         const schema=require('./model/user').register;
@@ -71,13 +74,15 @@ mongodb.connect(url, {}, (err, client)=>{
         }
     });
     
+    // Select all
+    router.get('/users', verify, async (req, res)=>{
+        const users=await db.collection(collection).find({}).toArray();
+        res.send(users);
+    });
 
-    
-    // APIs
-    router.get('/users', verify, (req, res)=>{
-        res.json({
-            "title":"Papiez nie zyje",
-            "Content":"Ez lol"
-        });
+    // Select one
+    router.get('/users/:email', verify, async (req, res)=>{
+        const user=await db.collection(collection).findOne({name: req.params.email});
+        res.send(user);
     });
 });
