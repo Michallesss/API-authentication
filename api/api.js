@@ -35,11 +35,8 @@ mongodb.connect(url, {}, (err, client)=>{
         if(!user) {return res.status(400).send('Name or password is wrong 1');}
 
         // Hash password
-        // ! dodać salt może dlatego nie działa logowanie
-        //const validPass=await bcrypt.compare(req.password, user.password); //TODO: working password hashing
-        // ! nie działa hashowanie wymaga chyba daty w bazie wtf (Error: data and hash arguments required) 
-        //if(!validPass) {return res.status(400).send('Name or password is wrong 2');}
-        // ! ustaw niżej salt na '' i przetestuj :)
+        const validPass=bcrypt.compareSync(req.body.password, user.password);
+        if(!validPass) {return res.status(400).send('Name or password is wrong 2');}
 
         // Auth token
         const token=jwt.sign({_id: user._id}, process.env.TOKEN_SECRET);
@@ -62,8 +59,7 @@ mongodb.connect(url, {}, (err, client)=>{
         }
         else {
             // Hash password
-            const salt=await bcrypt.genSalt(16);
-            const hashedpassword=await bcrypt.hash(value.password,salt);
+            const hashedpassword=bcrypt.hashSync(value.password, 16);
             value.password=hashedpassword;
 
             // Save to database
