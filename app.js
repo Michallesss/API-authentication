@@ -23,5 +23,3 @@ app.use(express.json());
 // Import API
 const api=require('./api/api');
 app.use('/api', api);
-const web=require('./web');
-app.use('/', web);
