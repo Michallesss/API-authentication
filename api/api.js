@@ -32,11 +32,11 @@ mongodb.connect(url, {}, (err, client)=>{
     
         // If exist
         const user=await db.collection(collection).findOne({name: value.name});
-        if(!user) {return res.status(400).send('Name or password is wrong 1');}
+        if(!user) {return res.status(400).send('Name or password is wrong');}
 
         // Hash password
         const validPass=bcrypt.compareSync(req.body.password, user.password);
-        if(!validPass) {return res.status(400).send('Name or password is wrong 2');}
+        if(!validPass) {return res.status(400).send('Name or password is wrong');}
 
         // Auth token
         const token=jwt.sign({_id: user._id}, process.env.TOKEN_SECRET);
