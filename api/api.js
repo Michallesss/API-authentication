@@ -2,7 +2,7 @@ const mongodb=require('mongodb').MongoClient;
 const router=require('express').Router();
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
-const verify=require('./verifytoken');
+const verify=require('./middleware/verifytoken');
 module.exports=router;
 
 // Connect to DB
@@ -39,7 +39,7 @@ mongodb.connect(url, {}, (err, client)=>{
         if(!validPass) {return res.status(400).send('Name or password is wrong');}
 
         // Auth token
-        const token=jwt.sign({_id: user._id}, process.env.TOKEN_SECRET);
+        const token=jwt.sign({_id: user._id}, process.env.TOKEN_SECRET); // !!! Remember to sign also with password (not only with id)
         res.status(200).header('auth-token', token).send(token);
     });
 
